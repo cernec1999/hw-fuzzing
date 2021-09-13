@@ -313,6 +313,13 @@ def run_docker_container_locally(config, exp_data_path):
             "%s/infra/base-afl/%s:/scripts/%s" %
             (config.root_path, script, script)
         ])
+    if config.fuzzer == "qsym":
+      for script in ["compile", "fuzz"]:
+        cmd.extend([
+            "-v",
+            "%s/infra/base-qsym/%s:/scripts/%s" %
+            (config.root_path, script, script)
+        ])
   # Set target Docker image and run
   cmd.extend(["-t", config.docker_image])
   # If manual mode, start shell

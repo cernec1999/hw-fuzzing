@@ -133,6 +133,15 @@ Python 3.8, and requires the following dependencies.
 2. Grab a cup of coffee ☕... this will take a while since we are building LLVM
    here.
 
+### VI. Set Host Parameters
+
+The following two lines are neccessary to ensure a smooth fuzzing environment. The
+first command simply specifies the location and format of core dump files for AFL.
+The second command sets the CPU to run at the maximum possible frequency.
+
+1. `echo '/cores/core.%e.%p' | sudo tee /proc/sys/kernel/core_pattern`
+2. `echo performance | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor`
+
 ### VI. Fuzz a Design
 
 ##### a. Fuzzing Locally

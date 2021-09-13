@@ -1,3 +1,4 @@
+#!/bin/bash -eux
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Docker image for with Verilator v4.040 installed
+# Install dependencies
+QSYM_INSTALL_PACKAGES="git sudo"
+apt-get install -y $QSYM_INSTALL_PACKAGES
 
-FROM hw-fuzzing/base-clang-12.0.0
-MAINTAINER trippel@umich.edu
+# Clone QSYM
+echo "Checking out QSYM ..."
+cd $SRC && git clone --depth 1 $QSYM_REPO_URL
 
-# Putting installation steps in a script reduces the number of intermediate
-# layers generated from the Dockerfile.
-COPY checkout_build_install_verilator.sh /root/
-RUN /root/checkout_build_install_verilator.sh
-RUN rm /root/checkout_build_install_verilator.sh
-ENV VERILATOR_ROOT "$SRC/verilator"
+# Build QSYM
+cd qsym
+./setup.sh
+pip install --upgrade virtualenv
+virtualenv venv -p /usr/bin/python2.7
+source ./venv/bin/activate
+pip install .
 
-# Add Verilator to PATH
-ENV PATH="$PATH:$VERILATOR_ROOT/bin"
+# Remove installation dependencies to shrink image size\
+SUDO_FORCE_REMOVE=yes apt-get remove --purge -y $QSYM_INSTALL_PACKAGES
+apt-get autoremove -y

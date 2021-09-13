@@ -15,10 +15,11 @@
 
 DOCKER_REPO="hw-fuzzing"
 BASE_IMAGE_TAG="base-image"
-CLANG_IMAGE_TAG="base-clang-11.0.0"
+CLANG_IMAGE_TAG="base-clang-12.0.0"
 VERILATOR_IMAGE_TAG="base-verilator"
 SIM_IMAGE_TAG="base-sim"
 AFL_IMAGE_TAG="base-afl"
+QSYM_IMAGE_TAG="base-qsym"
 AFL_TERM_ON_CRASH_IMAGE_TAG="base-afl-term-on-crash"
 
 if [ -z ${HW_FUZZING+x} ]; then
@@ -41,4 +42,5 @@ else
   docker build -t $DOCKER_REPO/$AFL_TERM_ON_CRASH_IMAGE_TAG \
     --build-arg AFL_REPO_URL="https://github.com/timothytrippel/AFL.git" \
     $HW_FUZZING/infra/$AFL_IMAGE_TAG
+  docker build -t $DOCKER_REPO/$QSYM_IMAGE_TAG $HW_FUZZING/infra/$QSYM_IMAGE_TAG
 fi

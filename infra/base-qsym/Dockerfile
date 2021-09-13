@@ -12,17 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Docker image for with Verilator v4.040 installed
+# Docker image with AFL installed.
 
-FROM hw-fuzzing/base-clang-12.0.0
-MAINTAINER trippel@umich.edu
+FROM hw-fuzzing/base-afl
+LABEL MAINTAINER=ccerne@vt.edu
 
 # Putting installation steps in a script reduces the number of intermediate
-# layers generated from the Dockerfile.
-COPY checkout_build_install_verilator.sh /root/
-RUN /root/checkout_build_install_verilator.sh
-RUN rm /root/checkout_build_install_verilator.sh
-ENV VERILATOR_ROOT "$SRC/verilator"
+# layers generated from the Dockerfile
+COPY checkout_build_install_qsym.sh /root/
 
-# Add Verilator to PATH
-ENV PATH="$PATH:$VERILATOR_ROOT/bin"
+# This contains patched qsym to work on ubuntu 18.04
+ARG QSYM_REPO_URL="https://github.com/cernec1999/qsym"
+ENV QSYM_REPO_URL ${QSYM_REPO_URL}
+RUN /root/checkout_build_install_qsym.sh
+RUN rm /root/checkout_build_install_qsym.sh
+
+# Copy over circuit build/fuzz scripts
+COPY compile fuzz $SCRIPTS/

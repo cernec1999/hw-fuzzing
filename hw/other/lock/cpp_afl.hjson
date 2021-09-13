@@ -9,8 +9,9 @@
   tb_type: cpp
   // Options: [afl, afl_opt]
   tb: afl_opt
-  // Options: [afl, afl-term-on-crash, sim]
-  fuzzer: afl-term-on-crash
+  // Options: [afl, afl-term-on-crash, qsym, sim]
+  fuzzer: qsym
+  default_input: afl_seed.0.hwf
   // Parts of the design that should be instrumented for fuzzing
   instrument_dut: 1
   instrument_tb: 0
@@ -25,7 +26,7 @@
 
   // HDL Generation Parameters (if any)
   hdl_gen_params: {
-    num_lock_states: 16
+    num_lock_states: 64
     lock_comp_width: 4
   }
 

@@ -16,7 +16,7 @@ module lock_tb(
   input wire reset_n,
   input wire clk,
   input wire  [3:0] code,
-  output reg [3:0] state,
+  output reg [5:0] state,
   output wire unlocked
 );
 

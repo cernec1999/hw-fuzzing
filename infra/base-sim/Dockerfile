@@ -31,6 +31,10 @@ COPY opentitan-requirements.txt sim-requirements.txt $SRC/
 # Install python dependencies
 RUN apt-get update && apt-get install -y git xxd
 
+# Upgrade pip and setuptools to specific versions for the opentitan
+# requirements
+RUN python3 -m pip install pip==20.02 && python3 -m pip install setuptools==44.0.0
+
 # Install OpenTitan and Python Dependencies
 RUN python3 -m pip install -r $SRC/opentitan-requirements.txt
 RUN python3 -m pip install -r $SRC/sim-requirements.txt

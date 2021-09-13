@@ -59,7 +59,7 @@ if [[ $FUZZER == "sim" ]]; then
     echo "ERROR: unsupported testbench type. Aborting!" | tee -a logs/exp.log
   fi
 
-elif [[ $FUZZER == "afl" || $FUZZER == "afl-term-on-crash" ]]; then
+elif [[ $FUZZER == "afl" || $FUZZER == "afl-term-on-crash" || $FUZZER == "qsym" ]]; then
   if [[ $TB_TYPE == "cocotb" ]]; then
     # cocotb Required Environment Vars.
     export MODULE=tb.$TB_TYPE.$TB.${TOPLEVEL}_tb
