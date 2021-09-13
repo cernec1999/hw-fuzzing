@@ -142,7 +142,7 @@ The second command sets the CPU to run at the maximum possible frequency.
 1. `echo '/cores/core.%e.%p' | sudo tee /proc/sys/kernel/core_pattern`
 2. `echo performance | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor`
 
-### VI. Fuzz a Design
+### VII. Fuzz a Design
 
 ##### a. Fuzzing Locally
 
