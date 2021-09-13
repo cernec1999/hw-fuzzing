@@ -137,10 +137,12 @@ Python 3.8, and requires the following dependencies.
 
 The following two lines are neccessary to ensure a smooth fuzzing environment. The
 first command simply specifies the location and format of core dump files for AFL.
-The second command sets the CPU to run at the maximum possible frequency.
+The second command sets the CPU to run at the maximum possible frequency. The third
+parameter allows for programs to trace other programs.
 
 1. `echo '/cores/core.%e.%p' | sudo tee /proc/sys/kernel/core_pattern`
 2. `echo performance | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor`
+3. `echo 0|sudo tee /proc/sys/kernel/yama/ptrace_scope`
 
 ### VII. Fuzz a Design
 
