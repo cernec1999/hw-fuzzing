@@ -40,7 +40,7 @@ class Config():
     toplevel: Name of the toplevel to fuzz (from hw/).
     tb_type: Type of testbench [cpp | cocotb].
     tb: Testbench name [default | afl].
-    fuzzer: Fuzzer to use [sim | afl | afl-term-on-crash | qsym].
+    fuzzer: Fuzzer to use [sim | afl | afl-term-on-crash | qsym | concolichw].
     run_on_gcp: Determines whether fuzzer will be run locally or on GCP [0 | 1].
     gcp_params: GCP parameters specifying what machine to launch fuzzer on. See
       example gcp_config.hjson file in root hw-fuzzing/.

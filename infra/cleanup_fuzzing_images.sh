@@ -15,7 +15,7 @@
 
 # Remove all DUT Docker images
 GCP_PROJECT_ID=$(gcloud config get-value project)
-FUZZERS="afl-term-on-crash afl sim qsym"
+FUZZERS="afl-term-on-crash afl sim qsym concolichw"
 for SOC in $(ls hw/); do
   for DUT in $(ls hw/$SOC/); do
     if [ -d hw/$SOC/$DUT ]; then

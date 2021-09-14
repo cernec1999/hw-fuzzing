@@ -320,6 +320,18 @@ def run_docker_container_locally(config, exp_data_path):
             "%s/infra/base-qsym/%s:/scripts/%s" %
             (config.root_path, script, script)
         ])
+    if config.fuzzer == "concolichw":
+      for script in ["compile", "fuzz"]:
+        cmd.extend([
+            "-v",
+            "%s/infra/base-concolichw/%s:/scripts/%s" %
+            (config.root_path, script, script)
+        ])
+      cmd.extend([
+        "-v",
+        "%s/infra/base-concolichw/ConcolicHW:/src/concolichw" %
+        (config.root_path)
+      ])
   # Set target Docker image and run
   cmd.extend(["-t", config.docker_image])
   # If manual mode, start shell

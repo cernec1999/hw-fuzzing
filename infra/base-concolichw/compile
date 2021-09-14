@@ -1,0 +1,168 @@
+#!/bin/bash -eu
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+LINE_SEP="-------------------------------------------------------------------"
+
+################################################################################
+################################################################################
+## Set build flags
+################################################################################
+################################################################################
+echo "Setting compiler/linker flags..."
+
+# Set DUT compiler
+if (($INSTRUMENT_DUT == 1)); then
+  DUT_CXX="$SRC/AFL/afl-clang-fast++"
+else
+  DUT_CXX="clang++"
+fi
+DUT_CXXFLAGS="-DVL_DEBUG"
+
+# Set TB compiler
+if (($INSTRUMENT_TB == 1)); then
+  TB_CXX="$SRC/AFL/afl-clang-fast++"
+else
+  TB_CXX="clang++"
+fi
+TB_CXXFLAGS="-DVL_DEBUG"
+
+# Set HWF ISA
+source set_hwf_isa.sh
+
+# Set Verilator Runtime compiler
+if (($INSTRUMENT_VLTRT == 1)); then
+  VLTRT_CXX="$SRC/AFL/afl-clang-fast++"
+else
+  VLTRT_CXX="clang++"
+fi
+VLTRT_CXXFLAGS="-DVL_DEBUG"
+
+# Set Linker
+if (($INSTRUMENT_DUT || $INSTRUMENT_TB || $INSTRUMENT_VLTRT)); then
+  LINK="$SRC/AFL/afl-clang-fast++"
+else
+  LINK="clang++"
+fi
+
+# Print Fuzzer/Compiler/Linker Configurations
+echo "Done!"
+echo $LINE_SEP
+make \
+  DUT_CXX=$DUT_CXX \
+  DUT_CXXFLAGS="$DUT_CXXFLAGS" \
+  TB_CXX=$TB_CXX \
+  TB_CXXFLAGS="$TB_CXXFLAGS" \
+  VLTRT_CXX=$VLTRT_CXX \
+  VLTRT_CXXFLAGS="$VLTRT_CXXFLAGS" \
+  LINK=$LINK \
+  DISABLE_VCD_TRACING=1 \
+  debug-make
+
+################################################################################
+################################################################################
+## Cleanup any prior builds and report some design stats
+################################################################################
+################################################################################
+# Clean any prior builds
+make clean
+
+# Report # of embedded SVAs
+make \
+  DUT_CXX=$DUT_CXX \
+  DUT_CXXFLAGS="$DUT_CXXFLAGS" \
+  TB_CXX=$TB_CXX \
+  TB_CXXFLAGS="$TB_CXXFLAGS" \
+  VLTRT_CXX=$VLTRT_CXX \
+  VLTRT_CXXFLAGS="$VLTRT_CXXFLAGS" \
+  LINK=$LINK \
+  DISABLE_VCD_TRACING=1 \
+  report-svas
+
+# Report # of basic blocks in the model
+make \
+  DUT_CXX=$DUT_CXX \
+  DUT_CXXFLAGS="$DUT_CXXFLAGS" \
+  TB_CXX=$TB_CXX \
+  TB_CXXFLAGS="$TB_CXXFLAGS" \
+  VLTRT_CXX=$VLTRT_CXX \
+  VLTRT_CXXFLAGS="$VLTRT_CXXFLAGS" \
+  LINK=$LINK \
+  DISABLE_VCD_TRACING=1 \
+  report-bbs
+
+################################################################################
+################################################################################
+## Install test bench dependencies
+################################################################################
+################################################################################
+if [[ $TB_TYPE == "cocotb" ]]; then
+  install-cocotb-deps
+elif [[ $TB_TYPE == "cpp" ]]; then
+  install-cpp-deps
+else
+  echo "ERROR: unsupported testbench type. Aborting!" | tee -a logs/exp.log
+fi
+
+################################################################################
+################################################################################
+## Verilate HDL and Compile/Instrument SW Model
+################################################################################
+################################################################################
+echo $LINE_SEP
+echo "Verilating/Compiling/Instrumenting the DUT ..."
+make \
+  DUT_CXX=$DUT_CXX \
+  DUT_CXXFLAGS="$DUT_CXXFLAGS" \
+  TB_CXX=$TB_CXX \
+  TB_CXXFLAGS="$TB_CXXFLAGS" \
+  VLTRT_CXX=$VLTRT_CXX \
+  VLTRT_CXXFLAGS="$VLTRT_CXXFLAGS" \
+  LINK=$LINK \
+  DISABLE_VCD_TRACING=1
+rm -rf build
+# Create un-instrumented binary
+TOPLEVEL=$TOPLEVEL-uninst make \
+  DUT_CXX=clang++ \
+  DUT_CXXFLAGS="$DUT_CXXFLAGS" \
+  TB_CXX=$TB_CXX \
+  TB_CXXFLAGS="$TB_CXXFLAGS" \
+  VLTRT_CXX=$VLTRT_CXX \
+  VLTRT_CXXFLAGS="$VLTRT_CXXFLAGS" \
+  LINK=$LINK \
+  DISABLE_VCD_TRACING=1
+rm -rf build
+# Create un-instrumented binary
+TOPLEVEL=$TOPLEVEL-concolichw make \
+  DUT_CXX=clangwrapper \
+  DUT_CXXFLAGS="$DUT_CXXFLAGS" \
+  TB_CXX=clangwrapper \
+  TB_CXXFLAGS="$TB_CXXFLAGS" \
+  VLTRT_CXX=clangwrapper \
+  VLTRT_CXXFLAGS="$VLTRT_CXXFLAGS" \
+  LINK=clang++ \
+  LDFLAGS="-L/src/concolichw/build/src/iranalysis -l:libiranalysis.so" \
+  DISABLE_VCD_TRACING=1
+echo "Done!"
+
+
+################################################################################
+################################################################################
+## Done
+################################################################################
+################################################################################
+echo $LINE_SEP
+echo -e "\e[1;32mBUILD & INSTRUMENTATION SUCCESSFUL -- Done!\e[0m"
+exit 0
+

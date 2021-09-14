@@ -20,6 +20,7 @@ VERILATOR_IMAGE_TAG="base-verilator"
 SIM_IMAGE_TAG="base-sim"
 AFL_IMAGE_TAG="base-afl"
 QSYM_IMAGE_TAG="base-qsym"
+CONCOLIC_HW_IMAGE_TAG="base-concolichw"
 AFL_TERM_ON_CRASH_IMAGE_TAG="base-afl-term-on-crash"
 
 if [ -z ${HW_FUZZING+x} ]; then
@@ -43,4 +44,5 @@ else
     --build-arg AFL_REPO_URL="https://github.com/timothytrippel/AFL.git" \
     $HW_FUZZING/infra/$AFL_IMAGE_TAG
   docker build -t $DOCKER_REPO/$QSYM_IMAGE_TAG $HW_FUZZING/infra/$QSYM_IMAGE_TAG
+  docker build -t $DOCKER_REPO/$CONCOLIC_HW_IMAGE_TAG $HW_FUZZING/infra/$CONCOLIC_HW_IMAGE_TAG
 fi

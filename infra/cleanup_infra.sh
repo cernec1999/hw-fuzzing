@@ -28,6 +28,7 @@ else
   docker rmi -f $DOCKER_REPO/base-afl:latest
   docker rmi -f $DOCKER_REPO/base-sim:latest
   docker rmi -F $DOCKER_REPO/base-qsym:latest
+  docker rmi -F $DOCKER_REPO/base-concolichw:latest
 
   # Only remove these when prompted since they take a long time to build
   if [[ ${1-} == "--all" ]]; then
